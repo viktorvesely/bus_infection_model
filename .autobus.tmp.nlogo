@@ -1,4 +1,4 @@
-__includes["bus.nls" "stop.nls" "people.nls" ]
+__includes[ "debug.nls" "bus.nls" "stop.nls" "people.nls"]
 
 globals [
     width
@@ -7,6 +7,7 @@ globals [
     busX
     busY
     g_bus
+    g_debug
 ]
 
 patches-own [
@@ -20,6 +21,7 @@ to setup
     set width 50
     set height 50
     set offset 10
+    set g_debug true
 
     ask patches [
         set occupied? false
@@ -74,8 +76,8 @@ GRAPHICS-WINDOW
 17
 -19
 19
-0
-0
+1
+1
 1
 ticks
 30.0
@@ -241,6 +243,77 @@ bus-capacity
 NIL
 HORIZONTAL
 
+SLIDER
+738
+127
+958
+160
+sitting-people-rotation-spread
+sitting-people-rotation-spread
+0
+90
+18.5
+0.5
+1
+NIL
+HORIZONTAL
+
+SLIDER
+3
+359
+194
+392
+infected-portion
+infected-portion
+0
+1
+0.11
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+2
+405
+190
+438
+immune-portion
+immune-portion
+0
+1
+0.1
+0.01
+1
+NIL
+HORIZONTAL
+
+MONITOR
+4
+450
+128
+495
+Susceptible portions
+1 - (infected-portion + immune-portion)
+17
+1
+11
+
+SLIDER
+6
+508
+178
+541
+p-sitting
+p-sitting
+0
+1
+0.5
+0.01
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -345,11 +418,6 @@ false
 Circle -7500403 true true 0 0 300
 Circle -16777216 true false 30 30 240
 
-covid_person
-true
-12
-Polygon -13791810 true false 150 15 45 255 255 255 150 15 150 15 150 15
-
 cow
 false
 0
@@ -432,6 +500,16 @@ Rectangle -7500403 true true 45 120 255 285
 Rectangle -16777216 true false 120 210 180 285
 Polygon -7500403 true true 15 120 150 15 285 120
 Line -16777216 false 30 120 270 120
+
+immune_person
+true
+9
+Polygon -1184463 true false 150 15 45 255 255 255 150 15 150 15 150 15
+
+infected_person
+true
+9
+Polygon -5825686 true false 150 15 45 255 255 255 150 15 150 15 150 15
 
 invisible
 true
@@ -516,6 +594,11 @@ star
 false
 0
 Polygon -7500403 true true 151 1 185 108 298 108 207 175 242 282 151 216 59 282 94 175 3 108 116 108
+
+susceptible_person
+true
+12
+Polygon -13791810 true false 150 15 45 255 255 255 150 15 150 15 150 15
 
 target
 false

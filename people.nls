@@ -1,7 +1,7 @@
 breed [people person]
 
 people-own [
-    infected?
+    person_state
     mask
     target
     moving?
@@ -9,22 +9,42 @@ people-own [
     die?
 ]
 
+to-report roll_dice [ probability ]
+  report random-float 1 <= probability
+end
+
 to init_person [x y]
-    set shape "covid_person"
-    set color person_susceptible_color
-    set infected? false
+    
+    (ifelse
+      roll_dice infected-portion [
+         set shape "infected_person"
+         set person_state state_infected
+      ]
+      roll_dice immune-portion [
+         set shape "immune_person"
+         set person_state state_immune
+      ] [
+         set shape "susceptible_person"
+         set person_state state_susceptible
+      ]
+    )
     set mask mask_none
     set xcor x
     set ycor y
     set die? false
-    set seated? true
-    ; TODO sit probability
     ; TODO maximize the target distance from other people
-    set target min-one-of (patches with [ occupied? = false and pcolor = seat_color ]) [ distance myself ]
+    set target nobody
+    
+    if roll_dice p-sitting [
+        set seated? true
+        set target min-one-of (patches with [ occupied? = false and pcolor = seat_color ]) [ distance myself ]
+    ]
+   
     if target = nobody [
         set seated? false 
         set target one-of patches with [ occupied? = false and pcolor = floor_color ] 
     ]
+    
 
     set moving? false 
     if target != nobody [
@@ -64,7 +84,7 @@ to person_tick
             if seated? [
                 let current_seat min-one-of seats [ distance myself ]
                 set heading [ heading ] of current_seat
-                ; TODO make spread
+                rt random (sitting-people-rotation-spread * 2) - sitting-people-rotation-spread
             ]
             
         ] [
@@ -72,6 +92,18 @@ to person_tick
           fd 1
         ]
     ]
+end
+
+to-report state_susceptible
+  report 0
+end
+
+to-report state_infected
+  report 1
+end
+
+to-report state_immune
+  report 2
 end
 
 to-report mask_none
@@ -86,6 +118,14 @@ to-report mask_medical
     report 2
 end
 
-to-report person_susceptible_color 
+to-report susceptible_color 
     report [ 0 40 255 ]
+end
+
+to-report infected_color
+    report [ 255 20 25 ]
+end
+
+to-report immune_color
+    report [ 255 10 255 ]
 end

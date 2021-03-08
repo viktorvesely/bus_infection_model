@@ -32,8 +32,19 @@ to spawn_people [ n ]
     let doors [ self ] of patches with [ pcolor = door_color ]
     let nDoors length doors
     let cDoor nobody
-    let peoplePerDoor round (n / nDoors)
+    let peoplePerDoor floor (n / nDoors)
     let i 0
+    
+    if (n / nDoors) <= 0.5 and (n / nDoors) > 0 [
+        set cDoor item (random nDoors) doors
+        let xDoor [ pxcor ] of cDoor
+        let yDoor [ pycor ] of cDoor
+        hatch-people n [
+            init_person xDoor yDoor
+        ]
+        set n_people n_people + n
+        stop
+    ]
     
     repeat nDoors [
         set cDoor item i doors
@@ -45,7 +56,8 @@ to spawn_people [ n ]
         set i i + 1
     ]
     
-    set n_people n_people + n
+    set n_people n_people + ( peoplePerDoor * nDoors )
+    
   
 end
 
@@ -59,6 +71,10 @@ to bus_tick
         
         if (n_people + nPeople) > max_capacity [
             set nPeople max_capacity - n_people
+        ]
+        
+        if (n_people + nPeople) > bus-capacity [
+            set nPeople bus-capacity - n_people
         ]
         
         spawn_people nPeople
