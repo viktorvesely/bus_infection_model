@@ -53,7 +53,7 @@ to person_tick
     if moving? [
         let current patch-at 0 0
 
-        if current = target [
+        ifelse current = target [
 
             if die? [
                 die
@@ -63,15 +63,14 @@ to person_tick
 
             if seated? [
                 let current_seat min-one-of seats [ distance myself ]
-                let xFace xcor + [ xDir ] of current_seat
-                let yFace ycor + [ yDir ] of current_seat
-                facexy xFace yFace ; TODO make spread
+                set heading [ heading ] of current_seat
+                ; TODO make spread
             ]
             
+        ] [
+          face target
+          fd 1
         ]
-
-        face target
-        fd 1
     ]
 end
 
