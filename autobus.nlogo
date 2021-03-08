@@ -33,17 +33,12 @@ to setup
 end
 
 to go
-
-
     ask buses [
         bus_tick
     ]
-
     ask people [
         person_tick
     ]
-
-
     tick
 end
 

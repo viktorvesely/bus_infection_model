@@ -1,4 +1,4 @@
-__includes["bus.nls" "stop.nls" "people.nls" ]
+__includes[ "debug.nls" "bus.nls" "stop.nls" "people.nls"]
 
 globals [
     width
@@ -7,6 +7,7 @@ globals [
     busX
     busY
     g_bus
+    g_debug
 ]
 
 patches-own [
@@ -20,6 +21,7 @@ to setup
     set width 50
     set height 50
     set offset 10
+    set g_debug true
 
     ask patches [
         set occupied? false
@@ -31,7 +33,6 @@ to setup
 end
 
 to go
-
 
     ask buses [
         bus_tick
