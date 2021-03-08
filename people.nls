@@ -1,0 +1,92 @@
+breed [people person]
+
+people-own [
+    infected?
+    mask
+    target
+    moving?
+    seated?
+    die?
+]
+
+to init_person [x y]
+    set shape "covid_person"
+    set color person_susceptible_color
+    set infected? false
+    set mask mask_none
+    set xcor x
+    set ycor y
+    set die? false
+    set seated? true
+    ; TODO sit probability
+    ; TODO maximize the target distance from other people
+    set target min-one-of (patches with [ occupied? = false and pcolor = seat_color ]) [ distance myself ]
+    if target = nobody [
+        set seated? false 
+        set target one-of patches with [ occupied? = false and pcolor = floor_color ] 
+    ]
+
+    set moving? false 
+    if target != nobody [
+        ask target [
+            set occupied? true
+        ]
+        face target
+        set moving? true
+    ]
+
+end
+
+to leave_bus
+    ask target [
+      set occupied? false
+    ]
+  
+    set target min-one-of (patches with [ pcolor = door_color ]) [ distance myself ]
+    face target
+    set moving? true
+    set die? true
+end 
+
+to person_tick
+    
+    if moving? [
+        let current patch-at 0 0
+
+        if current = target [
+
+            if die? [
+                die
+            ]
+
+            set moving? false
+
+            if seated? [
+                let current_seat min-one-of seats [ distance myself ]
+                let xFace xcor + [ xDir ] of current_seat
+                let yFace ycor + [ yDir ] of current_seat
+                facexy xFace yFace ; TODO make spread
+            ]
+            
+        ]
+
+        face target
+        fd 1
+    ]
+end
+
+to-report mask_none
+    report 0
+end
+
+to-report mask_cloth
+    report 1
+end
+
+to-report mask_medical
+    report 2
+end
+
+to-report person_susceptible_color 
+    report [ 0 40 255 ]
+end

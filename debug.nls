@@ -1,0 +1,8 @@
+
+
+to debug [prefix value]
+  if g_debug [
+      show prefix
+      show value
+  ]
+end

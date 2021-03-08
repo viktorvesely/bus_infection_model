@@ -1,0 +1,268 @@
+breed [buses bus]
+
+breed [seats seat]
+
+seats-own [
+    xDir
+    yDir
+]
+
+buses-own [
+    bus_state
+    stop_duration
+    b_w
+    b_h
+    departed
+    max_capacity
+    n_people
+    stop_mu
+]
+
+
+to-report sample_people
+    report random-normal stop_mu 3
+end
+
+to init_stop 
+    set stop_duration sample_stop_duration
+    set stop_mu sample_stop_importance_mu
+end
+
+to spawn_people [ n ] 
+    let doors [ self ] of patches with [ pcolor = door_color ]
+    let nDoors length doors
+    let cDoor nobody
+    let peoplePerDoor round (n / nDoors)
+    let i 0
+    
+    repeat nDoors [
+        set cDoor item i doors
+        let xDoor [ pxcor ] of cDoor
+        let yDoor [ pycor ] of cDoor
+        hatch-people peoplePerDoor [
+            init_person xDoor yDoor
+        ]
+        set i i + 1
+    ]
+    
+    set n_people n_people + n
+  
+end
+
+
+to bus_tick 
+   
+    
+    if bus_state = state_spawn [
+             
+        let nPeople sample_people
+        
+        if (n_people + nPeople) > max_capacity [
+            set nPeople max_capacity - n_people
+        ]
+        
+        spawn_people nPeople
+        set bus_state state_boarding
+    ]
+    if bus_state = state_boarding [
+        if all? people [ moving? = false ] [
+            set bus_state state_traveling
+            set departed ticks
+        ]
+    ]
+
+    if bus_state = state_traveling [
+        
+        if (ticks - departed) >= journey-animation-duration [
+            set bus_state state_leaving
+        ]
+        
+    ]
+
+    if bus_state = state_leaving [
+        init_stop
+        
+        let nPeople sample_people
+        
+        if nPeople > n_people [
+          set nPeople n_people
+        ]
+        
+        
+        ask n-of nPeople people [
+            leave_bus
+        ]
+        
+        set bus_state state_repeat
+        
+    ]
+    
+    if bus_state = state_repeat [
+         if  all? people [ moving? = false ] [
+             set n_people count people
+             set bus_state state_spawn
+         ]
+    ]
+end
+
+
+to setup_bus
+
+    set busX 0
+    set busY 0
+
+    create-buses 1 [
+        set bus_state state_spawn
+        set shape "invisible"
+        set n_people 0
+    ]
+
+    set g_bus one-of buses
+    
+    ask g_bus [
+      init_stop
+    ]
+
+    file-open "map.bus"
+    while [not file-at-end?]
+    [
+        let line file-read-line
+        set busX length line
+        set busY busY + 1
+    ]
+    file-close
+    
+    ask g_bus [
+        set b_w busX
+        set b_h busY
+    ]
+    
+    set width busX + (offset * 2)
+    set height busY + (offset * 2)
+
+    let xSize (width / 2)
+    let ySize (height / 2)
+    
+
+    resize-world (- xSize) (xSize) (- ySize) (ySize)
+
+    let y 0
+    let tX 0
+    let tY 0
+    file-open "map.bus"
+    while [not file-at-end?]
+    [
+        let x 0
+        let line file-read-line
+        repeat (length line) [
+            let character item x line
+            set tX mapX x
+            set tY mapY y
+        
+            if character = "#" [
+                place_wall tX tY
+            ]
+            if character = "D" [
+                place_door tX tY
+            ]
+            if character = " " [
+                place_floor tX tY
+            ]
+            if character = "V" [
+                place_seat tX tY 0 -1
+            ]
+            if character = "^" [
+                place_seat tX tY 0 1
+            ]
+            if character = ">" [
+                place_seat tX tY 1 0
+            ]
+            if character = "<" [
+                place_seat tX tY -1 0
+            ]
+        
+            set x x + 1
+        ]
+
+        set y y + 1
+    ]
+    file-close
+    
+    let nSeats count seats
+    let nFloor count patches with [ pcolor = floor_color ]
+    ask g_bus [
+        set max_capacity nFloor + nSeats
+    ]
+    
+end
+
+to place_wall [x y]
+    ask patch x y [
+        set pcolor wall_color
+    ]
+end
+
+to place_floor [x y]
+  
+  ask patch x y [
+    set pcolor floor_color
+  ]
+end
+
+to place_door [x y]
+    ask patch x y [
+        set pcolor door_color
+    ]
+end
+
+to place_seat [x y xDirection yDirection]
+    ask patch x y [
+        set pcolor seat_color
+    ]
+
+    create-seats 1 [
+        set shape "seat"
+        set xcor x
+        set ycor y
+        set size 1.1
+        facexy (x + xDirection) (y + yDirection)
+        set xDir xDirection
+        set yDir yDirection
+    ]
+end
+
+to-report state_spawn
+    report 0
+end
+
+to-report state_boarding
+    report 1
+end
+
+to-report state_traveling
+    report 2
+end
+
+to-report state_leaving
+    report 3
+end
+
+to-report state_repeat
+    report 4
+end
+
+to-report wall_color
+    report [250 40 4]
+end
+
+to-report floor_color
+    report [120 120 120]
+end
+
+to-report door_color
+    report [15 251 255]
+end
+
+to-report seat_color
+    report [2 1 1]
+end
