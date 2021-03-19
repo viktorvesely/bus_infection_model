@@ -94,8 +94,33 @@ to person_tick
     ]
 end
 
+
+to releaseRNA [ minutes ]
+  let n_release [n_RNA] of g_bus
+  
+  set n_release n_release + dosis minutes mask
+  
+  ask g_bus [ set n_RNA n_release ]
+end
+
+to infect [ minutes ]
+   let chance pInfect minutes mask
+   
+   if roll_dice(chance) [
+     set shape "exposed_person"
+     set person_state state_exposed
+     set new_infections new_infections + 1
+   ]
+   
+   
+end
+
 to-report state_susceptible
   report 0
+end
+
+to-report state_exposed
+  report 4
 end
 
 to-report state_infected
@@ -111,11 +136,11 @@ to-report mask_none
 end
 
 to-report mask_cloth
-    report 1
+    report 0.5
 end
 
 to-report mask_medical
-    report 2
+    report 0.7
 end
 
 to-report susceptible_color 

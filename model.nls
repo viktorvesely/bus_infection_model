@@ -1,0 +1,76 @@
+to-report m_pDeposition
+  report 0.5
+end
+  
+to-report m_D50 
+  report 280
+end
+
+to-report m_emissionBreathing
+  report 0.06
+end
+
+to-report m_emissionSpeaking
+  report 0.6
+end
+
+to-report m_respirationRate
+  report 10
+end
+
+to-report m_virusConcentration
+  report 500000000
+end
+
+to-report m_muAerosolR
+  report 5
+end
+
+to-report m_virusLifetime
+  report 1.7
+end
+
+to-report m_area
+  report [b_w * b_h] of g_bus
+end
+
+to-report pSingleRNA 
+  report 1 - (10 ^ ((log 0.5 10) /  m_D50))
+end
+
+to-report RNAinAerosol
+  report m_virusConcentration * PI / 6 * (m_muAerosolR / 10000) ^ 3
+end
+
+to-report aerosolEmission 
+  let particles m_emissionBreathing * (1 - m_speakingRatio) + m_emissionSpeaking * (m_speakingRatio)
+  report particles * 1000 * m_respirationRate * 60
+end 
+
+to-report aerosolConcentration
+  report aerosolEmission / (60 * m_busHeight * 1000)
+end
+
+to-report RNAinLiter
+  report aerosolConcentration * RNAinAerosol
+end
+
+to-report RNAdose
+  report m_respirationRate * 60 * RNAinLiter * m_pDeposition
+end
+
+to-report ventilationAndLifeTime [ dose minutes ]
+  let hours minutes / 60
+  report dose / (m_ventilationRate * hours + 1 / (m_virusLifetime * hours)) * hours 
+end
+
+to-report dosis [minutes maskEfficiency]
+  let hours minutes / 60
+  report RNAdose / (m_ventilationRate * hours + 1 / (m_virusLifetime * hours)) * (1 - maskEfficiency) * hours
+end
+
+to-report pInfect [minutes maskEfficiency]
+  let exposedRNA [n_RNA] of g_bus
+  set exposedRNA exposedRNA * (minutes / 60) * (1 - maskEfficiency)
+  report 1 - (1 - pSingleRNA) ^ exposedRNA
+end
