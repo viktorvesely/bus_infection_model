@@ -70,8 +70,12 @@ to adjustRNA
   let minutes stop_duration
   let n n_RNA
   ; Ventilation
+  
+  debug "Pice1" ventilationAndLifeTime n minutes 
    
-  ; set n ventilationAndLifeTime n minutes
+  set n ventilationAndLifeTime n (minutes / 2)
+  set n ventilationAndLifeTime n (minutes / 2)
+  debug "Pice2" n
   
   ask g_bus [
     set n_RNA n

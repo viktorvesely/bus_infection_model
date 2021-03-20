@@ -342,7 +342,7 @@ m_ventilationRate
 m_ventilationRate
 0.3
 5
-1.98
+0.36
 0.01
 1
 NIL
