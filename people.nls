@@ -2,8 +2,8 @@ breed [people person]
 
 people-own [
     person_state
-    mask
-    target
+    mask ; the probability of the particles not going through
+    target ; the positon in the bus
     moving?
     seated?
     die?
@@ -70,17 +70,21 @@ end
 
 to person_tick
     
+    ; Are we supposed to be moving
     if moving? [
         let current patch-at 0 0
 
+        ; Did we arrive to the target
         ifelse current = target [
 
+            ; Are we supposed to be dead - rip : (
             if die? [
                 die
             ]
 
             set moving? false
 
+            ; Also align with the seat of which the person is currently sitting at
             if seated? [
                 let current_seat min-one-of seats [ distance myself ]
                 set heading [ heading ] of current_seat

@@ -1,27 +1,25 @@
 __includes[ "debug.nls" "bus.nls" "people.nls" "model.nls"]
 
 globals [
-    width
-    height
-    offset
-    busX
-    busY
-    g_bus
-    g_debug
+    width ; number of patches in one row
+    height ; number of patches in one column
+    offset ; betwenn the border and the bus
+    busX ; bus width
+    busY ; bus height
+    g_bus ; global bus variable
+    g_debug ; boolean that turns on debug msgs
     new_infections
-    time
+    time ; real-world time in minutes
 ]
 
 patches-own [
-    occupied?
+    occupied? ; only one person can be at one patch at the time
 ]
 
 to setup
 
     clear-all
 
-    set width 50
-    set height 50
     set offset 10
     set g_debug true
     set new_infections 0
@@ -51,10 +49,12 @@ to go
     tick
 end
 
+; Function that takes x-file position and returns the x patch position
 to-report mapX [x]
     report min-pxcor + offset + x
 end
 
+; Function that takes y-file position and returns the y patch position
 to-report mapY [y]
     report min-pycor + offset + ([ b_w ] of g_bus) - y
 end

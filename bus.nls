@@ -9,29 +9,32 @@ seats-own [
 
 buses-own [
     bus_state
-    stop_duration
-    b_w
-    b_h
-    departed
-    max_capacity
-    n_people
-    stop_mu
-    n_RNA
-    alreadySpread?
+    stop_duration ; in minutes
+    b_w ; bus width
+    b_h ; bus height 
+    departed ; departed time in ticks
+    max_capacity ; natural max capacity
+    n_people ; people in the bus
+    stop_mu ; the mean for a normal distribution for the current stop
+    n_RNA ; amount of infected particles
+    alreadySpread? ; for handling animation 
 ]
 
 
+; Function that will decide how many people leave and enter at a given stop
+; Each stop uses it's own mean for the distribution
 to-report sample_people
     report random-normal stop_mu 3
 end
 
+; Set the mean for the next stop distribution
+; Also generate the duraton of the next stop
 to init_stop 
     set stop_duration sample_stop_duration
     set stop_mu sample_stop_importance_mu
-    
-    
 end
 
+; Spawn people at doors
 to spawn_people [ n ] 
     let doors [ self ] of patches with [ pcolor = door_color ]
     let nDoors length doors
@@ -39,6 +42,7 @@ to spawn_people [ n ]
     let peoplePerDoor floor (n / nDoors)
     let i 0
     
+    ; Check if there is a sufficient amount of people per door
     if (n / nDoors) <= 0.5 and (n / nDoors) > 0 [
         set cDoor item (random nDoors) doors
         let xDoor [ pxcor ] of cDoor
@@ -50,6 +54,7 @@ to spawn_people [ n ]
         stop
     ]
     
+    ; If there is spawn some people at each door
     repeat nDoors [
         set cDoor item i doors
         let xDoor [ pxcor ] of cDoor
@@ -65,11 +70,12 @@ to spawn_people [ n ]
   
 end
 
+; Ventilation, virus lifetime and production from infected people
 to adjustRNA
 
   let minutes stop_duration
   let n n_RNA
-  ; Ventilation
+  ; Ventilation code
   
   debug "Pice1" ventilationAndLifeTime n minutes 
    
@@ -81,7 +87,7 @@ to adjustRNA
     set n_RNA n
   ]
    
-  ; New Release
+  ; Infected poeple production of RNA code
   
   ask people with [ person_state = state_infected ] [
     releaseRNA minutes
@@ -89,6 +95,7 @@ to adjustRNA
   
 end
 
+; Adjust the number of infected particles and also infect other people
 to update_infections
   adjustRNA
   
@@ -101,15 +108,17 @@ end
 
 to bus_tick 
    
-    
+    ; Spawn people and send them to their position
     if bus_state = state_spawn [
              
         let nPeople sample_people
         
+        ; Check the people natural capacity
         if (n_people + nPeople) > max_capacity [
             set nPeople max_capacity - n_people
         ]
         
+        ; Check the people artificial capacity
         if (n_people + nPeople) > bus-capacity [
             set nPeople bus-capacity - n_people
         ]
@@ -117,6 +126,8 @@ to bus_tick
         spawn_people nPeople
         set bus_state state_boarding
     ]
+
+    ; Wait until all people arrive at their position
     if bus_state = state_boarding [
         if all? people [ moving? = false ] [
             set alreadySpread? false
@@ -125,18 +136,23 @@ to bus_tick
         ]
     ]
 
+    ; Wait journey-animation-duration amount of ticks and in the middle of the animation
+    ; update the infections
     if bus_state = state_traveling [
         
         let passed ticks - departed
         let animationTrigger round (journey-animation-duration / 2) 
         
+        ; Check if there is enough ticks for the animation to happen
         ifelse animationTrigger < 2 and not alreadySpread? [
-          update_infections
-          set alreadySpread? true
-        ] [
-          if passed = animationTrigger [
+            ; If no just update the infections now
             update_infections
-          ]
+            set alreadySpread? true
+        ] [
+            ; If yes then wait till the middle of the animation
+            if passed = animationTrigger [
+                update_infections
+            ]
         ]
     
         if passed >= journey-animation-duration [
@@ -145,9 +161,10 @@ to bus_tick
         
     ]
 
+    ; Order people to leave the bus
     if bus_state = state_leaving [
         set time time + stop_duration
-        init_stop
+        init_stop ; also initialize new stop normal distribution
         
         let nPeople sample_people
         
@@ -164,6 +181,7 @@ to bus_tick
         
     ]
     
+    ; Wait for the pople to leave
     if bus_state = state_repeat [
          if  all? people [ moving? = false ] [
              set n_people count people
@@ -172,12 +190,13 @@ to bus_tick
     ]
 end
 
-
+; Function that reads the bus map file and draws the bus
 to setup_bus
 
     set busX 0
     set busY 0
 
+    ; Firstly we need to acquire the dimensions of the bus
     file-open "map.bus"
     while [not file-at-end?]
     [
@@ -193,6 +212,7 @@ to setup_bus
     let xSize (width / 2)
     let ySize (height / 2)
     
+    ; Resize the amounf of patches
     resize-world (- xSize) (xSize) (- ySize) (ySize)
     
     create-buses 1 [
@@ -201,18 +221,16 @@ to setup_bus
         set n_people 0
     ]
     
-
+    ; Set the global variable of the bus
     set g_bus one-of buses
     
     ask g_bus [
       init_stop
-    ]
-    
-    ask g_bus [
-        set b_w busX
-        set b_h busY
+      set b_w busX
+      set b_h busY
     ]
 
+    ; Now draw the bus actually
     let y 0
     let tX 0
     let tY 0
@@ -255,6 +273,7 @@ to setup_bus
     ]
     file-close
     
+    ; Calculate the natural bus capacity
     let nSeats count seats
     let nFloor count patches with [ pcolor = floor_color ]
     ask g_bus [
@@ -263,11 +282,14 @@ to setup_bus
     
 end
 
+; Function that determines the stops normal distributions (also a normal distribution)
+; This function generates the mean for the stops normal distributions
 to-report sample_stop_importance_mu
     let importance-mu random-normal bus-stop-importance-mu bus-stop-importance-sd
     report importance-mu
 end
 
+; This function determines the the stop duration (in minutes)
 to-report sample_stop_duration
     report random-normal bus-stop-duration-mu bus-stop-duration-sd
 end 
