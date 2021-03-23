@@ -13,22 +13,67 @@ to-report roll_dice [ probability ]
   report random-float 1 <= probability
 end
 
+to-report person_shape 
+  let status ""
+  let maskType ""
+  
+  (ifelse
+    person_state = state_infected [
+      set status "infected"
+    ]
+    person_state = state_susceptible [
+      set status "susceptible"
+    ]
+    person_state = state_immune [
+      set status "immune"
+    ]
+    person_state = state_exposed [
+      set status "exposed"
+    ]
+  )
+  
+  (ifelse
+    mask = mask_none [
+      set maskType "none"
+    ]
+    mask = mask_cloth [
+      set maskType "cloth"
+    ]
+    mask = mask_medical [
+      set maskType "medical"
+    ]
+  )
+ 
+  
+  report (word "person_" status "_" maskType) 
+end
+
 to init_person [x y]
     
     (ifelse
       roll_dice infected-portion [
-         set shape "infected_person"
          set person_state state_infected
       ]
       roll_dice immune-portion [
-         set shape "immune_person"
          set person_state state_immune
       ] [
-         set shape "susceptible_person"
          set person_state state_susceptible
       ]
     )
-    set mask mask_none
+  
+  (ifelse
+      roll_dice mask-cloth-portion [
+         set mask mask_cloth
+      ]
+      roll_dice mask-medical-portion [
+         set mask mask_medical
+      ] [
+         set mask mask_none
+      ]
+    )
+  
+    set shape person_shape
+  
     set xcor x
     set ycor y
     set die? false

@@ -453,7 +453,7 @@ mask-cloth-portion
 mask-cloth-portion
 0
 1
-0.25
+0.24
 0.01
 1
 NIL

@@ -18,6 +18,7 @@ buses-own [
     stop_mu ; the mean for a normal distribution for the current stop
     n_RNA ; amount of infected particles
     alreadySpread? ; for handling animation 
+    n_stops ; amount of visited bus stops
 ]
 
 
@@ -30,6 +31,7 @@ end
 ; Set the mean for the next stop distribution
 ; Also generate the duraton of the next stop
 to init_stop 
+    set n_stops n_stops + 1
     set stop_duration sample_stop_duration
     set stop_mu sample_stop_importance_mu
 end
@@ -107,6 +109,11 @@ to update_infections
 end
 
 to bus_tick 
+   
+   ; Check if the bus reached the goal amount of stops
+   if n_stops = journey-stops-amount and journey-stops-amount != 0 [
+       stop
+   ]
    
     ; Spawn people and send them to their position
     if bus_state = state_spawn [
@@ -228,6 +235,7 @@ to setup_bus
       init_stop
       set b_w busX
       set b_h busY
+      set n_stops 0
     ]
 
     ; Now draw the bus actually
@@ -264,6 +272,12 @@ to setup_bus
             ]
             if character = "<" [
                 place_seat tX tY -1 0
+            ]
+            if character = "G" [
+                place_glass tX tY
+            ]
+            if character = "X" [
+                place_barrier tX tY
             ]
         
             set x x + 1
@@ -313,6 +327,18 @@ to place_door [x y]
     ]
 end
 
+to place_barrier [x y]
+    ask patch x y [
+        set pcolor barrier_color
+    ]
+end
+
+to place_glass [x y]
+    ask patch x y [
+        set pcolor glass_color
+    ]
+end
+
 to place_seat [x y xDirection yDirection]
     ask patch x y [
         set pcolor seat_color
@@ -358,9 +384,17 @@ to-report floor_color
 end
 
 to-report door_color
-    report [15 251 255]
+    report [66 6 54]
 end
 
 to-report seat_color
     report [2 1 1]
+end
+
+to-report glass_color
+    report [3 252 248]
+end
+
+to-report barrier_color
+    report [255 251 0]
 end
