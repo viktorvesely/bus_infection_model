@@ -10,6 +10,7 @@ globals [
     g_debug ; boolean that turns on debug msgs
     new_infections
     time ; real-world time in minutes
+    g_stop?
 ]
 
 patches-own [
@@ -24,6 +25,7 @@ to setup
     set g_debug true
     set new_infections 0
     set time 0
+    set g_stop? false
 
     ask patches [
         set occupied? false
@@ -256,7 +258,7 @@ sitting-people-rotation-spread
 sitting-people-rotation-spread
 0
 90
-18.5
+7.5
 0.5
 1
 NIL
@@ -312,7 +314,7 @@ p-sitting
 p-sitting
 0
 1
-0.5
+0.22
 0.01
 1
 NIL
@@ -430,10 +432,10 @@ time
 11
 
 SLIDER
-204
-543
-376
-576
+199
+537
+371
+570
 journey-stops-amount
 journey-stops-amount
 0
@@ -453,7 +455,7 @@ mask-cloth-portion
 mask-cloth-portion
 0
 1
-0.24
+0.17
 0.01
 1
 NIL

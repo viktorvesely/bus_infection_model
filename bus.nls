@@ -112,7 +112,8 @@ to bus_tick
    
    ; Check if the bus reached the goal amount of stops
    if n_stops = journey-stops-amount and journey-stops-amount != 0 [
-       stop
+    set g_stop? true   
+    stop
    ]
    
     ; Spawn people and send them to their position
