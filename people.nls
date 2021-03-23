@@ -156,8 +156,8 @@ to infect [ minutes ]
    let chance pInfect minutes mask
    
    if roll_dice(chance) [
-     set shape "exposed_person"
      set person_state state_exposed
+    set shape person_shape
      set new_infections new_infections + 1
    ]
    
