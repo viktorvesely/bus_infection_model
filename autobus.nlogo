@@ -405,7 +405,7 @@ Inf %
 MONITOR
 606
 584
-716
+774
 629
 Infected particles
 [n_RNA] of g_bus
@@ -444,7 +444,7 @@ journey-stops-amount
 journey-stops-amount
 0
 50
-40.0
+0.0
 1
 1
 NIL

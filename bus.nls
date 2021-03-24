@@ -85,9 +85,8 @@ to adjustRNA
   set n ventilationAndLifeTime n (minutes / 2)
   debug "Pice2" n
   
-  ask g_bus [
-    set n_RNA n
-  ]
+  set n_RNA ventilationAndLifeTime n_RNA minutes
+  
    
   ; Infected poeple production of RNA code
   

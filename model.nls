@@ -3,7 +3,7 @@ to-report m_pDeposition
 end
   
 to-report m_D50 
-  report 280
+  report 316
 end
 
 to-report m_emissionBreathing
@@ -61,7 +61,7 @@ end
 
 to-report ventilationAndLifeTime [ dose minutes ]
   let hours minutes / 60
-  report (dose / (m_ventilationRate + 1 / (m_virusLifetime))) * hours
+  report dose * (1 - 1 / (E ^ 2)) ^ ( hours * (m_ventilationRate + 1 / (m_virusLifetime))) 
 end
 
 to-report dosis [minutes maskEfficiency]
