@@ -1,0 +1,8 @@
+set m_pDeposition 0.5 ; The portion of RNA particles evaporating
+set m_D50 316 ; The amount of RNA particles needed for 50% chance of infection
+set m_emissionBreathing 0.06 ; of RNA particles in cm^3
+set m_emissionSpeaking 0.6 ; of RNA particles in cm^3
+set m_respirationRate 10 ; in liters per hour
+set m_virusConcentration 500000000 ; per cm^3
+set m_muAerosolR 5; Mean of the RNA particle diameter
+set m_virusLifetime 1.7 ; in hours in aerosol

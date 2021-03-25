@@ -38,7 +38,6 @@ function singleRNA(params) {
 }
 
 
-// IMORTANT! TIME IS IN MINUTES and the rest is perHour
 
 function RNAinAerosol(params) {
     return params.virusConcentration * Math.PI / 6 * Math.pow(params.meanAerosolR / 10000, 3);

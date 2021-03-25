@@ -1,69 +1,78 @@
-to-report m_pDeposition
+to-report m_pDeposition ; The portion of RNA particles evaporating
   report 0.5
 end
-  
-to-report m_D50 
+
+to-report m_D50 ; The amount of RNA particles needed for 50% chance of infection
   report 316
 end
 
-to-report m_emissionBreathing
+to-report m_emissionBreathing ; of RNA particles in cm^3
   report 0.06
 end
 
-to-report m_emissionSpeaking
+to-report m_emissionSpeaking ; of RNA particles in cm^3
   report 0.6
 end
 
-to-report m_respirationRate
+to-report m_respirationRate ; in liters per hour
   report 10
 end
 
-to-report m_virusConcentration
+to-report m_virusConcentration ; per cm^3
   report 500000000
 end
 
-to-report m_muAerosolR
+to-report m_muAerosolR ; Mean of the RNA particle diameter
   report 5
 end
 
-to-report m_virusLifetime
+to-report m_virusLifetime ; in hours in aerosol
   report 1.7
 end
 
+; Area of the bus
 to-report m_area
   report [(b_w - 2) * (b_h - 2)] of g_bus
 end
 
-to-report pSingleRNA 
+; Probability of infection from a single RNA particle
+to-report pInfectionPerRNA 
   report 1 - (10 ^ ((log 0.5 10) /  m_D50))
 end
 
+; A maximum possible RNA concentration in aerosol
 to-report RNAinAerosol
   report m_virusConcentration * (PI / 6) * ((m_muAerosolR / 10000) ^ 3)
 end
 
+; Emission of RNA particles whilst speaking/breathing per hour
 to-report aerosolEmission 
   let particles m_emissionBreathing * (1 - m_speakingRatio) + m_emissionSpeaking * (m_speakingRatio)
   report particles * 1000 * m_respirationRate * 60
 end 
 
+; Possible aerosol concetration in the bus per hour
 to-report aerosolConcentration
   report aerosolEmission / (60 * m_busHeight * 1000)
 end
 
+; Conversion to liters
 to-report RNAinLiter
   report aerosolConcentration * RNAinAerosol
 end
 
+; Applying m_pDeposition and calulculating the amount per hour
 to-report RNAdose
   report m_respirationRate * 60 * RNAinLiter * m_pDeposition
 end
 
+; How many RNA particles die out and/or are ventilated
 to-report ventilationAndLifeTime [ dose minutes ]
   let hours minutes / 60
   report dose * (1 - 1 / (E ^ 2)) ^ ( hours * (m_ventilationRate + 1 / (m_virusLifetime))) 
 end
 
+; The actual dosis of RNA particles after applying also masks
 to-report dosis [minutes maskEfficiency]
   let hours minutes / 60
   report RNAdose * (1 - maskEfficiency) * hours
@@ -72,5 +81,5 @@ end
 to-report pInfect [minutes maskEfficiency]
   let exposedRNA [n_RNA] of g_bus
   set exposedRNA exposedRNA * (minutes / 60) * (1 - maskEfficiency)
-  report 1 - ((1 - pSingleRNA) ^ exposedRNA)
+  report 1 - ((1 - pInfectionPerRNA) ^ exposedRNA)
 end
