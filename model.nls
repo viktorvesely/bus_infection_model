@@ -53,7 +53,7 @@ end
 
 ; Possible aerosol concetration in the bus per hour
 to-report aerosolConcentration
-  report aerosolEmission / (60 * m_busHeight * 1000)
+  report aerosolEmission / (m_area * m_busHeight * 1000)
 end
 
 ; Conversion to liters
