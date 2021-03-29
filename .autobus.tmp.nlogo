@@ -93,10 +93,10 @@ ticks
 30.0
 
 BUTTON
-24
-31
-87
-64
+26
+60
+89
+93
 NIL
 setup
 NIL
@@ -111,9 +111,9 @@ NIL
 
 SLIDER
 0
-113
+164
 185
-146
+197
 bus-stop-importance-mu
 bus-stop-importance-mu
 1
@@ -126,9 +126,9 @@ HORIZONTAL
 
 SLIDER
 0
-158
+209
 187
-191
+242
 bus-stop-importance-sd
 bus-stop-importance-sd
 0.1
@@ -140,10 +140,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-98
-32
-161
-65
+100
+61
+163
+94
 NIL
 go
 T
@@ -158,9 +158,9 @@ NIL
 
 SLIDER
 0
-210
+261
 186
-243
+294
 bus-stop-duration-mu
 bus-stop-duration-mu
 5
@@ -173,9 +173,9 @@ HORIZONTAL
 
 SLIDER
 0
-261
+312
 183
-294
+345
 bus-stop-duration-sd
 bus-stop-duration-sd
 0.5
@@ -192,6 +192,16 @@ TEXTBOX
 819
 68
 Internal parameters also playable
+15
+0.0
+1
+
+TEXTBOX
+27
+21
+204
+41
+Parameters to play with
 15
 0.0
 1
@@ -213,9 +223,9 @@ HORIZONTAL
 
 SLIDER
 0
-303
+354
 172
-336
+387
 bus-capacity
 bus-capacity
 0
@@ -272,10 +282,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-245
-586
-369
-631
+250
+544
+374
+589
 Susceptible portions
 1 - (infected-portion + immune-portion)
 17
@@ -299,9 +309,9 @@ HORIZONTAL
 
 SLIDER
 1
-401
+452
 173
-434
+485
 m_speakingRatio
 m_speakingRatio
 0
@@ -314,9 +324,9 @@ HORIZONTAL
 
 SLIDER
 0
-448
+499
 172
-481
+532
 m_ventilationRate
 m_ventilationRate
 0.3
@@ -329,9 +339,9 @@ HORIZONTAL
 
 SLIDER
 1
-488
+539
 173
-521
+572
 m_busHeight
 m_busHeight
 2
@@ -377,9 +387,9 @@ time
 
 SLIDER
 0
-352
+403
 172
-385
+436
 journey-stops-amount
 journey-stops-amount
 0
@@ -453,20 +463,10 @@ Masks
 
 TEXTBOX
 21
-79
+130
 171
-97
+148
 Bus parameters
-14
-0.0
-1
-
-TEXTBOX
-268
-544
-358
-562
-Population
 14
 0.0
 1
